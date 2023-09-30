@@ -1,4 +1,6 @@
 const inputs = Array.from(document.querySelectorAll("input"));
+const inputsContainer = document.querySelector(".inputs-box");
+
 const countBtn = document.querySelector("#count-btn");
 const sumResult = document.querySelector("#sum");
 const averageResult = document.querySelector("#average");
@@ -27,9 +29,18 @@ const getMax = () => {
   maxResult.textContent = max;
 };
 
-countBtn.addEventListener("click", () => {
-  const sum = countSum();
-  countAverage(sum);
-  getMin();
-  getMax();
-});
+// countBtn.addEventListener("click", () => {
+//   const sum = countSum();
+//   countAverage(sum);
+//   getMin();
+//   getMax();
+// });
+
+inputs.forEach((input) =>
+  input.addEventListener("input", () => {
+    const sum = countSum();
+    countAverage(sum);
+    getMin();
+    getMax();
+  })
+);
