@@ -21,17 +21,28 @@ const moveSlide = (infiniteAction) => {
   slidesContainer.style.transform = `translateX(${-slideWidth * currentIndex}px)`;
 };
 
-nextBtn.addEventListener("click", () => {
-  currentIndex++;
-  moveSlide();
-});
+const lockButtons = () => {
+  nextBtn.setAttribute("disabled", true);
+  prevBtn.setAttribute("disabled", true);
+};
 
-prevBtn.addEventListener("click", () => {
-  currentIndex--;
+const unLockButtons = () => {
+  nextBtn.removeAttribute("disabled");
+  prevBtn.removeAttribute("disabled");
+};
+
+const onButtonClick = (direction) => {
+  direction ? currentIndex++ : currentIndex--;
   moveSlide();
-});
+  lockButtons();
+};
+
+nextBtn.addEventListener("click", () => onButtonClick(true));
+
+prevBtn.addEventListener("click", () => onButtonClick(false));
 
 slidesContainer.addEventListener("transitionend", () => {
+  unLockButtons();
   if (currentIndex === 0 || currentIndex === slides.length) {
     slidesContainer.style.transition = "none";
     currentIndex = currentIndex === 0 ? slides.length : 0;

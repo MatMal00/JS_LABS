@@ -11,7 +11,7 @@
   width: 600px;
   height: 400px;
   margin: 100px auto 0 auto;
-  /* overflow: hidden; */
+  overflow: hidden;
 }
 
 #slider .slides {
@@ -36,12 +36,3 @@
 #slider .button:last-child {
   right: 0;
 }
-
-/* @keyframes pociag-w-lewo {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-2000px);
-  }
-} */
