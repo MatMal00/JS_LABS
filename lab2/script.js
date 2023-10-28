@@ -50,11 +50,11 @@ slidesContainer.addEventListener("transitionend", () => {
   }
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-  setInterval(() => {
-    currentIndex++;
-    moveSlide();
-  }, 900);
-});
+// document.addEventListener("DOMContentLoaded", () => {
+//   setInterval(() => {
+//     currentIndex++;
+//     moveSlide();
+//   }, 900);
+// });
 
 moveSlide();
