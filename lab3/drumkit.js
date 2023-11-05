@@ -1,5 +1,6 @@
 const recordBtns = document.querySelectorAll('.record');
 const playRecordBtns = document.querySelectorAll('.play');
+const playAll = document.querySelector('#play-all');
 
 const trackArray = [
   { endTime: 0, sound: [] },
@@ -45,6 +46,7 @@ function recordTrack(track) {
 }
 
 function playTrack(track) {
+  console.log('playing');
   track.sound.forEach(sound => {
     setTimeout(() => {
       onKeyPress(sound.key);
@@ -54,3 +56,4 @@ function playTrack(track) {
 
 recordBtns.forEach((btn, index) => btn.addEventListener('click', () => recordTrack(trackArray[index])));
 playRecordBtns.forEach((btn, index) => btn.addEventListener('click', () => playTrack(trackArray[index])));
+playAll.addEventListener('click', () => trackArray.forEach(track => playTrack(track)));
