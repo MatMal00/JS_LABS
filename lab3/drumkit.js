@@ -1,20 +1,26 @@
-const recordBtnOne = document.querySelector("#record-one");
-const playRecordBtnOne = document.querySelector("#play-one");
+const recordBtns = document.querySelectorAll('.record');
+const playRecordBtns = document.querySelectorAll('.play');
 
-const trackOne = { endTime: 0, sound: [] };
+const trackArray = [
+  { endTime: 0, sound: [] },
+  { endTime: 0, sound: [] },
+  { endTime: 0, sound: [] },
+  { endTime: 0, sound: [] },
+  { endTime: 0, sound: [] },
+];
 
-document.addEventListener("keypress", onKeyPress);
+document.addEventListener('keypress', onKeyPress);
 
 const KeyToSound = {
-  a: document.querySelector("#s1"),
-  s: document.querySelector("#s2"),
-  d: document.querySelector("#s3"),
-  f: document.querySelector("#s4"),
-  g: document.querySelector("#s5"),
-  h: document.querySelector("#s6"),
-  j: document.querySelector("#s7"),
-  k: document.querySelector("#s8"),
-  l: document.querySelector("#s9"),
+  a: document.querySelector('#s1'),
+  s: document.querySelector('#s2'),
+  d: document.querySelector('#s3'),
+  f: document.querySelector('#s4'),
+  g: document.querySelector('#s5'),
+  h: document.querySelector('#s6'),
+  j: document.querySelector('#s7'),
+  k: document.querySelector('#s8'),
+  l: document.querySelector('#s9'),
 };
 
 function onKeyPress(event) {
@@ -27,26 +33,24 @@ function playSound(sound) {
   sound.play();
 }
 
-function recordTrack(trackArray) {
-  console.log("is recording");
-  const listener = document.addEventListener("keypress", (e) =>
-    trackArray.sound.push({ key: e, timeStamp: Date.now() })
-  );
+function recordTrack(track) {
+  console.log('is recording');
+  const listener = document.addEventListener('keypress', e => track.sound.push({ key: e, timeStamp: Date.now() }));
 
   setTimeout(() => {
-    document.removeEventListener("keypress", listener);
-    trackArray.endTime = Date.now();
-    console.log("record");
+    document.removeEventListener('keypress', listener);
+    track.endTime = Date.now();
+    console.log('record');
   }, 5000);
 }
 
-function playTrack(trackArray) {
-  trackArray.sound.forEach((track) => {
+function playTrack(track) {
+  track.sound.forEach(sound => {
     setTimeout(() => {
-      onKeyPress(track.key);
-    }, trackOne.endTime - track.timeStamp);
+      onKeyPress(sound.key);
+    }, track.endTime - sound.timeStamp);
   });
 }
 
-recordBtnOne.addEventListener("click", () => recordTrack(trackOne));
-playRecordBtnOne.addEventListener("click", () => playTrack(trackOne));
+recordBtns.forEach((btn, index) => btn.addEventListener('click', () => recordTrack(trackArray[index])));
+playRecordBtns.forEach((btn, index) => btn.addEventListener('click', () => playTrack(trackArray[index])));
