@@ -1,6 +1,8 @@
 const recordBtns = document.querySelectorAll('.record');
 const playRecordBtns = document.querySelectorAll('.play');
 const playAll = document.querySelector('#play-all');
+const metofromInput = document.querySelector('#metodrom');
+const metodromBtn = document.querySelector('#metodromBtn');
 
 const trackArray = [
   { endTime: 0, sound: [] },
@@ -9,6 +11,10 @@ const trackArray = [
   { endTime: 0, sound: [] },
   { endTime: 0, sound: [] },
 ];
+
+let interval;
+let noOfBeats = null;
+let isMetodromOn = false;
 
 document.addEventListener('keypress', onKeyPress);
 
@@ -54,6 +60,25 @@ function playTrack(track) {
   });
 }
 
+function metodromPlayPause() {
+  if (isMetodromOn) {
+    clearInterval(interval);
+
+    isMetodromOn = false;
+  } else if (noOfBeats) {
+    isMetodromOn = true;
+
+    interval = setInterval(() => {
+      playSound(KeyToSound['f']);
+    }, 60000 / noOfBeats);
+  }
+}
+
 recordBtns.forEach((btn, index) => btn.addEventListener('click', () => recordTrack(trackArray[index])));
 playRecordBtns.forEach((btn, index) => btn.addEventListener('click', () => playTrack(trackArray[index])));
 playAll.addEventListener('click', () => trackArray.forEach(track => playTrack(track)));
+metofromInput.addEventListener('input', e => {
+  console.log(e.target.value);
+  noOfBeats = e.target.value;
+});
+metodromBtn.addEventListener('click', () => metodromPlayPause());

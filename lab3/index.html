@@ -15,30 +15,39 @@
     <audio src="./sounds/snare.wav" id="s7"></audio>
     <audio src="./sounds/tink.wav" id="s8"></audio>
     <audio src="./sounds/tom.wav" id="s9"></audio>
-    <div>
-      <h2>First Track</h2>
-      <button class="record">record</button>
-      <button class="play">play</button>
-    </div>
-    <div>
-      <h2>Second Track</h2>
-      <button class="record">record</button>
-      <button class="play">play</button>
-    </div>
-    <div>
-      <h2>Third Track</h2>
-      <button class="record">record</button>
-      <button class="play">play</button>
-    </div>
-    <div>
-      <h2>Fourth Track</h2>
-      <button class="record">record</button>
-      <button class="play">play</button>
+    <div id="tracks-container">
+      <div>
+        <h2>First Track</h2>
+        <button class="record">record</button>
+        <button class="play">play</button>
+      </div>
+      <div>
+        <h2>Second Track</h2>
+        <button class="record">record</button>
+        <button class="play">play</button>
+      </div>
+      <div>
+        <h2>Third Track</h2>
+        <button class="record">record</button>
+        <button class="play">play</button>
+      </div>
+      <div>
+        <h2>Fourth Track</h2>
+        <button class="record">record</button>
+        <button class="play">play</button>
+      </div>
     </div>
     <br />
     <br />
     <br />
     <button id="play-all">play all</button>
+    <div>
+      <h2>Metodrom</h2>
+      <label for="metodrom"
+        >Ilość uderzeń na minutę <input id="metodrom" name="metodrom" type="range" min="1" max="60"
+      /></label>
+      <button id="metodromBtn">play/pause</button>
+    </div>
     <script src="drumkit.js"></script>
   </body>
 </html>
