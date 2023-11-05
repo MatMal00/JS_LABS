@@ -77,8 +77,5 @@ function metodromPlayPause() {
 recordBtns.forEach((btn, index) => btn.addEventListener('click', () => recordTrack(trackArray[index])));
 playRecordBtns.forEach((btn, index) => btn.addEventListener('click', () => playTrack(trackArray[index])));
 playAll.addEventListener('click', () => trackArray.forEach(track => playTrack(track)));
-metofromInput.addEventListener('input', e => {
-  console.log(e.target.value);
-  noOfBeats = e.target.value;
-});
+metofromInput.addEventListener('input', e => (noOfBeats = e.target.value));
 metodromBtn.addEventListener('click', () => metodromPlayPause());
