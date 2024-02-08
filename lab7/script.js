@@ -1,22 +1,22 @@
-var timeoutId;
-var cities = JSON.parse(localStorage.getItem('cities')) ?? [];
-var citiesData = [];
+var debounceTimer;
+var savedCities = JSON.parse(localStorage.getItem('savedCities')) ?? [];
+var weatherData = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
-  await refreshWeather();
-  const interval = setInterval(async () => {
-    await refreshWeather();
-  }, 1000 * 60 * 5);
-  clearInterval(interval);
+  await updateWeatherData();
+  const refreshInterval = setInterval(async () => {
+    await updateWeatherData();
+  }, 300000);
+  clearInterval(refreshInterval);
 });
 
 document.getElementById('cityInput').addEventListener('input', async function () {
-  let city = this.value;
+  let inputCity = this.value;
 
-  clearTimeout(timeoutId);
-  timeoutId = setTimeout(async function () {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(async function () {
     await fetch(
-      'http://geodb-free-service.wirefreethought.com/v1/geo/cities?namePrefix=' + city + '&types=CITY&sort=name',
+      `http://geodb-free-service.wirefreethought.com/v1/geo/cities?namePrefix=${inputCity}&types=CITY&sort=name`,
       {
         headers: {
           'Access-Control-Allow-Origin': '*',
@@ -24,110 +24,86 @@ document.getElementById('cityInput').addEventListener('input', async function ()
       }
     )
       .then(async response => await response.json())
-      .then(cities => {
-        let cityList = document.getElementById('cityList');
-        cityList.innerHTML = '';
+      .then(result => {
+        let cityDropdown = document.getElementById('cityList');
+        cityDropdown.innerHTML = '';
 
-        let cityPoland = cities.data.filter(x => x.country == 'Poland')[0]?.city;
-        if (cityPoland != 'undefined' && cityPoland != null) {
-          let option = document.createElement('option');
-          option.text = cityPoland;
-          cityList.appendChild(option);
+        let polishCity = result.data.find(city => city.country === 'Poland')?.city;
+        if (polishCity) {
+          cityDropdown.appendChild(new Option(polishCity));
         } else {
-          for (let i = 0; i < cities.data.length; i++) {
-            let option = document.createElement('option');
-            option.text = cities.data[i].city;
-            cityList.appendChild(option);
-          }
+          result.data.forEach(city => {
+            cityDropdown.appendChild(new Option(city.city));
+          });
         }
       });
   }, 800);
 });
 
 document.getElementById('deleteWeatherBtn').addEventListener('click', async () => {
-  let city = document.getElementById('cityList').value;
-  cities = cities.filter(x => x !== city);
-  localStorage.setItem('cities', JSON.stringify(cities));
-  await refreshWeather();
+  let selectedCity = document.getElementById('cityList').value;
+  savedCities = savedCities.filter(city => city !== selectedCity);
+  localStorage.setItem('savedCities', JSON.stringify(savedCities));
+  await updateWeatherData();
 });
 
 document.getElementById('getWeatherBtn').addEventListener('click', async () => {
-  let city = document.getElementById('cityList').value;
-  if (cities.some(x => x == city) || city == 'undefined' || city == '' || city == null) return;
-  cities.push(city);
-  localStorage.setItem('cities', JSON.stringify(cities));
-  await refreshWeather();
+  let selectedCity = document.getElementById('cityList').value;
+  if (!savedCities.includes(selectedCity) && selectedCity && selectedCity !== 'undefined') {
+    savedCities.push(selectedCity);
+    localStorage.setItem('savedCities', JSON.stringify(savedCities));
+    await updateWeatherData();
+  }
 });
 
-async function refreshWeather() {
-  citiesData = [];
-  var fetchingTask = new Promise((resolve, reject) => {
-    cities.forEach(async city => {
-      await fetch(
-        'https://api.openweathermap.org/data/2.5/forecast?q=' + city + '&appid=33a861c82d591ab52c21fb63bd0a30f7'
-      )
-        .then(async function (response) {
-          return await response.json();
-        })
-        .then(function (weather) {
-          let hours = [];
-          let temperatures = [];
+async function updateWeatherData() {
+  weatherData = [];
+  var weatherFetchTasks = new Promise(resolve => {
+    savedCities.forEach(async city => {
+      await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=33a861c82d591ab52c21fb63bd0a30f7`)
+        .then(async response => await response.json())
+        .then(weatherInfo => {
+          let forecastHours = weatherInfo.list.map(item => item.dt_txt);
+          let forecastTemperatures = weatherInfo.list.map(item => convertKelvinToCelsius(item.main.temp));
 
-          for (let i = 0; i < weather.list.length; i++) {
-            hours.push(weather.list[i].dt_txt);
-            temperatures.push(temperatureConverter(weather.list[i].main.temp));
-          }
-          citiesData.push({
-            icon: 'http://openweathermap.org/img/wn/' + weather.list[0].weather[0].icon + '@2x.png',
-            weather: weather.list[0].weather[0].main,
-            temperatures: temperatures,
-            hours: hours,
-            city: city,
-            rgba: random_rgba(),
+          weatherData.push({
+            iconUrl: `http://openweathermap.org/img/wn/${weatherInfo.list[0].weather[0].icon}@2x.png`,
+            weatherCondition: weatherInfo.list[0].weather[0].main,
+            temperatures: forecastTemperatures,
+            forecastHours: forecastHours,
+            cityName: city,
+            color: generateRandomRgba(),
           });
 
-          if (citiesData.length >= cities.length) {
+          if (weatherData.length === savedCities.length) {
             resolve();
           }
         });
     });
   });
 
-  fetchingTask.then(function () {
-    citiesData.sort((a, b) => {
-      const nameA = a.city.toUpperCase();
-      const nameB = b.city.toUpperCase();
-      if (nameA < nameB) {
-        return -1;
-      }
-      if (nameA > nameB) {
-        return 1;
-      }
-      return 0;
-    });
-
-    setChart();
-    setStats();
+  weatherFetchTasks.then(() => {
+    weatherData.sort((a, b) => a.cityName.localeCompare(b.cityName));
+    renderChart();
+    displayWeatherStats();
   });
 }
 
-function setChart() {
-  dataset = citiesData.map(x => {
-    return {
-      label: x.city,
-      data: x.temperatures,
-      backgroundColor: x.rgba,
-      borderColor: x.rgba,
-      borderWidth: 1,
-    };
-  });
+function renderChart() {
+  let chartData = weatherData.map(cityWeather => ({
+    label: cityWeather.cityName,
+    data: cityWeather.temperatures,
+    backgroundColor: cityWeather.color,
+    borderColor: cityWeather.color,
+    borderWidth: 1,
+  }));
 
-  let ctx = document.getElementById('weatherChart').getContext('2d');
-  new Chart(ctx, {
+  let chartContext = document.getElementById('weatherChart').getContext('2d');
+  new Chart(chartContext, {
     type: 'line',
     data: {
-      labels: citiesData.find(x => x !== undefined).hours,
-      datasets: dataset,
+      labels: weatherData[0]?.forecastHours,
+      datasets: chartData,
     },
     options: {
       scales: {
@@ -139,27 +115,26 @@ function setChart() {
   });
 }
 
-function setStats() {
-  var blocks = citiesData.map(x => {
-    return `<div style="margin: 50px">
-        <img class="icon" src="${x.icon}" height="128" width="128">
-        <p id="iconWeather">${x.city}: ${x.weather} ${x.temperatures[0]}C</p>
-    </div>`;
-  });
+function displayWeatherStats() {
+  let weatherBlocks = weatherData.map(
+    cityWeather => `
+    <div style="margin: 50px">
+      <img class="weatherIcon" src="${cityWeather.iconUrl}" height="128" width="128">
+      <p class="weatherDetails">${cityWeather.cityName}: ${cityWeather.weatherCondition} ${cityWeather.temperatures[0]}°C</p>
+    </div>
+  `
+  );
 
-  let data = document.getElementById('data');
-  data.innerHTML = blocks.join('');
+  document.getElementById('data').innerHTML = weatherBlocks.join('');
 }
 
-//https://stackoverflow.com/questions/23095637/how-do-you-get-random-rgb-in-javascript
-function random_rgba() {
-  var o = Math.round,
-    r = Math.random,
-    s = 255;
-  return 'rgba(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ',' + 0.25 + ')';
+function generateRandomRgba() {
+  let round = Math.round,
+    random = Math.random,
+    max = 255;
+  return `rgba(${round(random() * max)}, ${round(random() * max)}, ${round(random() * max)}, 0.25)`;
 }
 
-//https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_temp_converter_kelvin_to_celsius
-function temperatureConverter(valNum) {
-  return parseInt(valNum - 273.15);
+function convertKelvinToCelsius(kelvin) {
+  return Math.round(kelvin - 273.15);
 }
