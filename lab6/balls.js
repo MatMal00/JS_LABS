@@ -1,4 +1,4 @@
-let X = 4;
+let X = 1;
 let Y = 0.2 * window.innerWidth;
 let force = 100;
 var isInitialized = false;
@@ -6,122 +6,142 @@ var isInitialized = false;
 let balls = [];
 
 class Ball {
-    constructor(x, y, vx, vy, color) {
-        this.x = x;
-        this.y = y;
-        this.vx = vx;
-        this.vy = vy;
-        this.color = color;
-    }
+  constructor(x, y, vx, vy, color) {
+    this.x = x;
+    this.y = y;
+    this.vx = vx;
+    this.vy = vy;
+    this.color = color;
+  }
 
-    draw(ctx) {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, 3 * Math.PI);
-        ctx.fillStyle = this.color;
-        ctx.fill();
-    }
+  draw(ctx) {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, 3 * Math.PI);
+    ctx.fillStyle = this.color;
+    ctx.fill();
+  }
 
-    move() {
-        this.x += this.vx;
-        this.y += this.vy;
+  move() {
+    this.x += this.vx;
+    this.y += this.vy;
 
-        if (this.y - this.radius < 0 || this.y + this.radius > window.innerHeight) {
-            this.vy = -this.vy;
-        }
-        if (this.x - this.radius < 0 || this.x + this.radius > window.innerWidth) {
-            this.vx = -this.vx;
-        }
+    if (this.y - this.radius < 0 || this.y + this.radius > window.innerHeight) {
+      this.vy = -this.vy;
     }
+    if (this.x - this.radius < 0 || this.x + this.radius > window.innerWidth) {
+      this.vx = -this.vx;
+    }
+  }
+
+  isPointInside(x, y) {
+    const distance = Math.sqrt((x - this.x) ** 2 + (y - this.y) ** 2);
+    return distance < this.radius;
+  }
 }
 
 function getBall() {
-    let x = Math.random() * window.innerWidth;
-    let y = Math.random() * window.innerHeight;
-    let vx = Math.random() * 4 * (Math.random() < 0.5 ? -1 : 1);
-    let vy = Math.random() * 4 * (Math.random() < 0.5 ? -1 : 1);
-    let color = `rgb(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)})`;
-    let ball = new Ball(x, y, vx, vy, color);
-    ball.radius = 25 * Math.random();
-    return ball;
+  let x = Math.random() * window.innerWidth;
+  let y = Math.random() * window.innerHeight;
+  let vx = Math.random() * 4 * (Math.random() < 0.5 ? -1 : 1);
+  let vy = Math.random() * 4 * (Math.random() < 0.5 ? -1 : 1);
+  let color = `rgb(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(
+    Math.random() * 256
+  )})`;
+  let ball = new Ball(x, y, vx, vy, color);
+  ball.radius = 25 * Math.random();
+  return ball;
 }
 
 function drawFrame() {
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    for (let i = 0; i < balls.length; i++) {
-        let ball = balls[i];
-        ball.move();
-        ball.draw(context);
-        for (let j = i + 1; j < balls.length; j++) {
-            let ball2 = balls[j];
-            let distanceX = ball2.x - ball.x;
-            let distanceY = ball2.y - ball.y;
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  for (let i = 0; i < balls.length; i++) {
+    let ball = balls[i];
+    ball.move();
+    ball.draw(context);
+    for (let j = i + 1; j < balls.length; j++) {
+      let ball2 = balls[j];
+      let distanceX = ball2.x - ball.x;
+      let distanceY = ball2.y - ball.y;
 
-            let dist = Math.sqrt(distanceX * distanceX - distanceY * distanceY);
-            if (dist <= Y) {
-                context.beginPath();
-                context.moveTo(ball.x, ball.y);
-                context.lineTo(ball2.x, ball2.y);
-                context.stroke();
-            }
-        }
+      let dist = Math.sqrt(distanceX * distanceX - distanceY * distanceY);
+      if (dist <= Y) {
+        context.beginPath();
+        context.moveTo(ball.x, ball.y);
+        context.lineTo(ball2.x, ball2.y);
+        context.stroke();
+      }
     }
-    requestAnimationFrame(drawFrame);
+  }
+  requestAnimationFrame(drawFrame);
 }
 
 for (let i = 0; i < X; i++) {
-    balls.push(getBall());
+  balls.push(getBall());
 }
 
-let canvas = document.getElementById("canvas");
-let context = canvas.getContext("2d");
+let canvas = document.getElementById('canvas');
+let context = canvas.getContext('2d');
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-let start = document.getElementById("start");
-start.addEventListener("click", function () {
-    if (isInitialized)
-        return;
+let start = document.getElementById('start');
+start.addEventListener('click', function () {
+  if (isInitialized) return;
 
-    requestAnimationFrame(drawFrame);
-    isInitialized = true;
+  requestAnimationFrame(drawFrame);
+  isInitialized = true;
 });
 
-let reset = document.getElementById("reset");
-reset.addEventListener("click", function () {
-    balls = [];
-    for (let i = 0; i < X; i++) {
-        balls.push(getBall());
+let reset = document.getElementById('reset');
+reset.addEventListener('click', function () {
+  balls = [];
+  for (let i = 0; i < X; i++) {
+    balls.push(getBall());
+  }
+});
+
+let xDoc = document.getElementById('x');
+xDoc.addEventListener('input', function () {
+  X = this.value;
+});
+
+let yDoc = document.getElementById('y');
+yDoc.addEventListener('input', function () {
+  Y = this.value;
+});
+
+canvas.addEventListener('mousemove', function (event) {
+  let mouseX = event.clientX;
+  let mouseY = event.clientY;
+
+  for (let i = 0; i < balls.length; i++) {
+    let ball = balls[i];
+    let distanceX = mouseX - ball.x;
+    let distanceY = mouseY - ball.y;
+    let dist = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+    if (dist < force) {
+      ball.vx += (distanceX / dist) * (force - dist) * 0.01;
+      ball.vy += (distanceY / dist) * (force - dist) * 0.01;
     }
+  }
 });
 
-let xDoc = document.getElementById("x");
-xDoc.addEventListener("input", function () {
-    X = this.value;
+let forceInput = document.getElementById('force-value');
+forceInput.addEventListener('input', function () {
+  force = this.value;
 });
 
-let yDoc = document.getElementById("y");
-yDoc.addEventListener("input", function () {
-    Y = this.value
-});
+canvas.addEventListener('click', function (event) {
+  let mouseX = event.clientX;
+  let mouseY = event.clientY;
 
-canvas.addEventListener("mousemove", function (event) {
-    let mouseX = event.clientX;
-    let mouseY = event.clientY;
+  for (let i = balls.length - 1; i >= 0; i--) {
+    if (balls[i].isPointInside(mouseX, mouseY)) {
+      balls.splice(i, 1);
 
-    for (let i = 0; i < balls.length; i++) {
-        let ball = balls[i];
-        let distanceX = mouseX - ball.x;
-        let distanceY = mouseY - ball.y;
-        let dist = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-        if (dist < force) {
-            ball.vx += distanceX / dist * (force - dist) * 0.01;
-            ball.vy += distanceY / dist * (force - dist) * 0.01;
-        }
+      balls.push(getBall(), getBall());
+      break;
     }
-});
-
-let forceInput = document.getElementById("force-value");
-forceInput.addEventListener("input", function () {
-    force = this.value;
+  }
 });
