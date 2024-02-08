@@ -1,33 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
     <title>Document</title>
-</head>
+  </head>
 
-<body>
+  <body>
     <div>
-        <form method="post" onSubmit="addNote()">
-            <input type="text" name="title" id="title" placeholder="Title"><br>
-            <input type="text" name="description" id="description" placeholder="Description"><br>
-            Kolor notatki <input type="color" name="" id="color" placeholder="Color" value="#bbbbbb"><br>
-            <input type="submit" value="Add">
-        </form>
+      <form onSubmit="addNote(event);">
+        <input type="text" name="title" id="title" placeholder="Title" /><br />
+        <input type="text" name="description" id="description" placeholder="Description" /><br />
+        <select name="tag" id="tag">
+          <option value="work">Work</option>
+          <option value="home">Home</option>
+          <option value="other">Other</option></select
+        ><br />
+        Kolor notatki <input type="color" name="" id="color" placeholder="Color" value="#bbbbbb" /><br />
+        <input type="submit" value="Add" />
+      </form>
+      <search>
+        <label class="search" for="searchInput">Search Notes:</label>
+        <input type="text" id="searchInput" oninput="searchNotes(event)"
+      /></search>
     </div>
 
     <h2>Pinned</h2>
-    <div id="pinned-list-handle">
-    </div>
+    <div id="pinned-list-handle"></div>
     <h2>Other</h2>
-    <div id="list-handle">
-    </div>
+    <div id="list-handle"></div>
 
     <script type="text/javascript" src="note.js"></script>
-
-</body>
-
+  </body>
 </html>
