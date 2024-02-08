@@ -19,6 +19,13 @@
           <option value="other">Other</option></select
         ><br />
         Kolor notatki <input type="color" name="" id="color" placeholder="Color" value="#bbbbbb" /><br />
+        <input type="checkbox" id="reminderCheckbox" name="reminder" onchange="toggleReminderInputs()" />Dodaj
+        przypomnienie<br />
+        <div id="reminderInputs" style="display: none">
+          Wybierz datę: <input type="date" id="reminderDate" name="reminderDate" /><br />
+          wybierz godzinę: <input type="time" id="reminderTime" name="reminderTime" /><br />
+        </div>
+        <br />
         <input type="submit" value="Add" />
       </form>
       <search>

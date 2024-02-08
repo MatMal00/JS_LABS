@@ -5,6 +5,13 @@ const addNote = () => {
   const description = document.getElementById('description').value;
   const tag = document.getElementById('tag').value;
   const color = document.getElementById('color').value;
+  const reminderCheckbox = document.getElementById('reminderCheckbox').checked;
+
+  const dateValue = document.getElementById('reminderDate').value;
+  const timeValue = document.getElementById('reminderTime').value;
+  let reminderDate = null;
+
+  if (dateValue && timeValue && reminderCheckbox) reminderDate = new Date(dateValue + 'T' + timeValue);
 
   notes.push({
     title,
@@ -15,6 +22,8 @@ const addNote = () => {
     id: Math.max(...notes.map(o => o.id + 1)),
     pinned: false,
     done: false,
+    reminder: reminderCheckbox,
+    reminderDate,
   });
 
   localStorage.setItem('notes', JSON.stringify(notes));
@@ -60,6 +69,13 @@ function searchNotes(event) {
   );
 
   renderTree(filteredNotes);
+}
+
+function toggleReminderInputs() {
+  const reminderCheckbox = document.getElementById('reminderCheckbox');
+  const reminderInputs = document.getElementById('reminderInputs');
+
+  reminderInputs.style.display = reminderCheckbox.checked ? 'block' : 'none';
 }
 
 function renderTree(filteredNotes) {
@@ -110,6 +126,28 @@ function renderNote(note) {
     </div>`;
 }
 
+function checkForReminder() {
+  const now = new Date();
+
+  notes.forEach(note => {
+    if (note.reminder && note.reminderDate) {
+      const reminderDate = new Date(note.reminderDate);
+
+      if (
+        now.toDateString() >= reminderDate.toDateString() &&
+        now.getHours() >= reminderDate.getHours() &&
+        now.getMinutes() >= reminderDate.getMinutes()
+      ) {
+        alert(`Reminder for note: ${note.title}`);
+        note.reminder = false;
+      }
+    }
+  });
+  localStorage.setItem('notes', JSON.stringify(notes));
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   renderTree();
+  checkForReminder();
+  setInterval(checkForReminder, 10000);
 });
