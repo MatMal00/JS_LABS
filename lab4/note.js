@@ -14,6 +14,7 @@ const addNote = () => {
     color,
     id: Math.max(...notes.map(o => o.id + 1)),
     pinned: false,
+    done: false,
   });
 
   localStorage.setItem('notes', JSON.stringify(notes));
@@ -32,6 +33,14 @@ function removeNote(id) {
 function pinNote(id) {
   const note = notes.find(x => x.id === id);
   note.pinned = !note.pinned;
+
+  localStorage.setItem('notes', JSON.stringify(notes));
+  renderTree();
+}
+
+function markAsDone(id) {
+  const note = notes.find(x => x.id === id);
+  note.done = !note.done;
 
   localStorage.setItem('notes', JSON.stringify(notes));
   renderTree();
@@ -58,13 +67,18 @@ function renderTree(filteredNotes) {
 
   const list = document.getElementById('list-handle');
   const pinnedList = document.getElementById('pinned-list-handle');
+  const doneList = document.getElementById('done-list-handle');
+
   list.innerHTML = '';
   pinnedList.innerHTML = '';
+  doneList.innerHTML = '';
 
   notesToRender.forEach(note => {
     const noteHtml = renderNote(note);
     if (note.pinned) {
       pinnedList.innerHTML += noteHtml;
+    } else if (note.done) {
+      doneList.innerHTML += noteHtml;
     } else {
       list.innerHTML += noteHtml;
     }
@@ -81,9 +95,17 @@ function renderNote(note) {
         <p>TAG: ${note.tag}</p>
         <p>${new Date(note.date).toISOString()}</p>
         <div>
-            ${note.pinned}
-            <input type="button" value="X" onclick="removeNote(${note.id})">
-            <input type="button" value="Pin" onclick="pinNote(${note.id})">
+            <div>
+                <input type="button" value="X" onclick="removeNote(${note.id})">
+            </div>
+            <div>
+                ${note.pinned}
+                <input type="button" value="Pin" onclick="pinNote(${note.id})">
+            </div>       
+            <div>
+                ${note.done}
+                <input type="button" value="Done" onclick="markAsDone(${note.id})">
+            </div>
         </div>
     </div>`;
 }
