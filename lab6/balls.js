@@ -1,4 +1,4 @@
-let X = 1;
+let X = 5;
 let Y = 0.2 * window.innerWidth;
 let force = 100;
 var isInitialized = false;
@@ -42,13 +42,17 @@ class Ball {
 function getBall() {
   let x = Math.random() * window.innerWidth;
   let y = Math.random() * window.innerHeight;
-  let vx = Math.random() * 4 * (Math.random() < 0.5 ? -1 : 1);
-  let vy = Math.random() * 4 * (Math.random() < 0.5 ? -1 : 1);
+
   let color = `rgb(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(
     Math.random() * 256
   )})`;
-  let ball = new Ball(x, y, vx, vy, color);
+  let ball = new Ball(x, y, 1, 1, color);
   ball.radius = 25 * Math.random();
+  ball.energy = Math.max(2, Math.min(ball.radius / 2, 10));
+
+  ball.vx = ball.energy;
+  ball.vy = ball.energy;
+
   return ball;
 }
 
